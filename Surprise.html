@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Love Quiz 💖</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #d63384; /* dark pink */
+      font-family: 'Lexend', sans-serif;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .page {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      width: 100vw;
+      height: 100vh;
+      padding: 20px;
+      box-sizing: border-box;
+      animation: fadeIn 0.6s ease-in-out;
+    }
+
+    .active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    h1, .final-message {
+      font-size: 2em;
+      max-width: 700px;
+      margin-bottom: 40px;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+    }
+
+    .question {
+      font-size: 1.5em;
+      font-weight: 600;
+      margin-bottom: 30px;
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .options button {
+      padding: 15px;
+      font-size: 1em;
+      border: none;
+      border-radius: 10px;
+      background-color: white;
+      color: #d63384;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    .options button:hover {
+      background-color: #ffe6f0;
+    }
+
+    .options button:active {
+      transform: scale(0.98);
+    }
+
+    .heart-button {
+      margin-top: 40px;
+      font-size: 40px;
+      background-color: white;
+      color: #d63384;
+      border: none;
+      border-radius: 50%;
+      width: 80px;
+      height: 80px;
+      cursor: pointer;
+      animation: beat 1s infinite;
+    }
+
+    @keyframes beat {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+    }
+
+    .final-message {
+      font-size: 1.8em;
+      text-shadow: 1px 1px 6px rgba(0,0,0,0.2);
+    }
+
+    /* Music iframe (hidden) */
+    #music-player {
+      width: 0;
+      height: 0;
+      opacity: 0;
+      position: absolute;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hidden Music Player -->
+  <div id="music-player">
+    <iframe
+      id="ytplayer"
+      type="text/html"
+      width="0"
+      height="0"
+      src=""
+      frameborder="0"
+      allow="autoplay"
+      allowfullscreen
+    ></iframe>
+  </div>
+
+  <!-- Intro Page -->
+  <div class="page active" id="page0">
+    <h1>"Every moment with you is special, and this little surprise is just for you 💖"</h1>
+    <button class="heart-button" onclick="startMusicAndNext()">❤️</button>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        question: "When is my Birthday?",
+        options: ["18 December 2001", "14 February 2002", "25 December 2000", "1 January 2001"],
+        answer: "18 December 2001"
+      },
+      {
+        question: "What food do I like the most?",
+        options: ["Pizza", "Biryani", "Burger", "Pasta"],
+        answer: "Biryani"
+      },
+      {
+        question: "Have you ever got feelings to some other person for an instance?",
+        options: ["No", "Yes", "Maybe", "I don’t remember"],
+        answer: "Yes"
+      },
+      {
+        question: "Have you ever lied to me?",
+        options: ["Never!", "Yes", "Just once", "Not sure"],
+        answer: "Yes"
+      },
+      {
+        question: "Have you ever took someone's side against me?",
+        options: ["No way", "Yes", "Sometimes", "Only when you were wrong"],
+        answer: "Yes"
+      }
+    ];
+
+    let currentPage = 0;
+    let correctAnswers = 0;
+
+    function startMusicAndNext() {
+      // Start music
+      const yt = document.getElementById("ytplayer");
+      yt.src = "https://www.youtube.com/embed/vHICwpoiM4I?start=21&autoplay=1&loop=1&playlist=vHICwpoiM4I";
+
+      // Go to first question
+      nextPage();
+    }
+
+    function nextPage() {
+      const oldPage = document.getElementById(`page${currentPage}`);
+      if (oldPage) oldPage.classList.remove('active');
+
+      currentPage++;
+
+      if (currentPage <= questions.length) {
+        showQuestion(currentPage);
+      } else {
+        showFinalPage();
+      }
+    }
+
+    function showQuestion(index) {
+      const q = questions[index - 1];
+      const pageDiv = document.createElement('div');
+      pageDiv.className = 'page active';
+      pageDiv.id = `page${index}`;
+
+      const optionsHtml = q.options.map(opt =>
+        `<button onclick="checkAnswer(this, '${q.answer}')">${opt}</button>`
+      ).join('');
+
+      pageDiv.innerHTML = `
+        <div class="question">${q.question}</div>
+        <div class="options">${optionsHtml}</div>
+      `;
+
+      document.body.appendChild(pageDiv);
+    }
+
+    function checkAnswer(button, correct) {
+      if (button.innerText === correct) correctAnswers++;
+      nextPage();
+    }
+
+    function showFinalPage() {
+      const pageDiv = document.createElement('div');
+      pageDiv.className = 'page active';
+      pageDiv.id = `page${questions.length + 1}`;
+
+      const passed = correctAnswers >= 3;
+
+      pageDiv.innerHTML = `
+        <div class="final-message">
+          ${passed
+            ? "💘 You passed the quiz! That shows how much you care and remember. I love you! 💖"
+            : "You got " + correctAnswers + "/5. But I still love you no matter what! 💞"}
+        </div>
+      `;
+
+      document.body.appendChild(pageDiv);
+    }
+  </script>
+</body>
+</html>
